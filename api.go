@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"slices"
+	"strings"
 )
 
 func handleHealthz(w http.ResponseWriter, r *http.Request) {
@@ -15,10 +17,6 @@ func handleHealthz(w http.ResponseWriter, r *http.Request) {
 func handleValidate(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Body string `json:"body"`
-	}
-
-	type valid struct {
-		Valid bool `json:"valid"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -34,7 +32,15 @@ func handleValidate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondValid(w)
+	type Body struct {
+		CleanedBody string `json:"cleaned_body"`
+	}
+
+	respBody := Body{
+		CleanedBody: cleanupBody(params.Body),
+	}
+
+	jsonResponse(w, 200, respBody)
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
@@ -71,4 +77,21 @@ func jsonResponse(w http.ResponseWriter, code int, respBody any) {
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(code)
 	w.Write(dat)
+}
+
+func cleanupBody(body string) string {
+	blackLists := []string{
+		"kerfuffle",
+		"sharbert",
+		"fornax",
+	}
+
+	words := strings.Split(body, " ")
+	for i, word := range words {
+		if slices.Contains(blackLists, strings.ToLower(word)) {
+			words[i] = "****"
+		}
+	}
+
+	return strings.Join(words, " ")
 }
