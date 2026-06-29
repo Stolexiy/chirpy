@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"encoding/json"
@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-func handleHealthz(w http.ResponseWriter, r *http.Request) {
+func HandleHealthz(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(200)
 	w.Write([]byte("OK"))
 }
 
-func handleValidate(w http.ResponseWriter, r *http.Request) {
+func HandleValidate(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Body string `json:"body"`
 	}

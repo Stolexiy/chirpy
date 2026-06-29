@@ -8,7 +8,9 @@ import (
 	"os"
 	"sync/atomic"
 
+	"github.com/Stolexiy/chirpy/internal/api"
 	"github.com/Stolexiy/chirpy/internal/database"
+
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -58,8 +60,9 @@ func main() {
 	mux.Handle("/app/", http.StripPrefix("/app", apiCfg.middlewareMetricsInc(http.FileServer(http.Dir(filepathRoot)))))
 	mux.HandleFunc("GET /admin/metrics", apiCfg.handleMetrics)
 	mux.HandleFunc("POST /admin/reset", apiCfg.handleReset)
-	mux.HandleFunc("GET /api/healthz", handleHealthz)
-	mux.HandleFunc("POST /api/validate_chirp", handleValidate)
+	mux.HandleFunc("GET /api/healthz", api.HandleHealthz)
+	mux.HandleFunc("POST /api/validate_chirp", api.HandleValidate)
+	mux.HandleFunc("POST /api/users", api.HandleUsers)
 
 	srv := &http.Server{
 		Addr:    ":" + port,
